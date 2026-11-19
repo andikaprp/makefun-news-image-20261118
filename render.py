@@ -2,8 +2,8 @@
 """One Day on Earth - 18 November 2026 in one image.
 
 Renders a single 1024x1024 page that sums up one day of world news:
-a stat band, a sun-order world map, eleven illustrated dispatches and
-a 41-brief logbook, all drawn from stories-18.json. Deterministic:
+a stat band, a sun-order world map, sixteen illustrated dispatches
+and a 36-brief logbook, all drawn from stories-18.json. Deterministic:
 two runs produce byte-identical output. No network access.
 """
 
@@ -168,32 +168,32 @@ def header(img, page):
     d = ImageDraw.Draw(img, "RGBA")
     f_eye = font(SANS_B_PATH, 14)
     # eyebrow row: a small drawn diamond, then the two tracked labels
-    cx, cy = MARGIN + 4, 31
+    cx, cy = MARGIN + 4, 25
     d.polygon([(cx, cy - 5), (cx + 5, cy), (cx, cy + 5), (cx - 5, cy)],
               fill=AMBER)
-    draw_tracked(d, (MARGIN + 16, 24), page["eyebrow_left"], f_eye, AMBER, 1.4)
-    draw_right(d, (SIZE - MARGIN, 24), page["eyebrow_right"], f_eye,
+    draw_tracked(d, (MARGIN + 16, 18), page["eyebrow_left"], f_eye, AMBER, 1.4)
+    draw_right(d, (SIZE - MARGIN, 18), page["eyebrow_right"], f_eye,
                (203, 213, 228), 1.4)
     # title
     size = fit_size(d, page["title"], SERIF_PATH, 92, CW)
-    d.text((MARGIN - 2, 42), page["title"], font=font(SERIF_PATH, size),
+    d.text((MARGIN - 2, 32), page["title"], font=font(SERIF_PATH, size),
            fill=TITLE_GOLD)
     # subtitle, shrunk until it fits the measure
     sub_size = fit_size(d, page["subtitle"], SERIF_IT_PATH, 17, CW)
-    d.text((MARGIN, 138), page["subtitle"],
+    d.text((MARGIN, 110), page["subtitle"],
            font=font(SERIF_IT_PATH, sub_size), fill=(200, 207, 221))
     # double rule under the subtitle
-    d.line([MARGIN, 160, SIZE - MARGIN, 160], fill=AMBER + (220,), width=1)
-    d.line([MARGIN, 164, SIZE - MARGIN, 164], fill=AMBER + (150,), width=1)
+    d.line([MARGIN, 132, SIZE - MARGIN, 132], fill=AMBER + (220,), width=1)
+    d.line([MARGIN, 136, SIZE - MARGIN, 136], fill=AMBER + (150,), width=1)
 
 
 def stat_band(img, page, stats):
     d = ImageDraw.Draw(img, "RGBA")
-    d.text((MARGIN, 172), page["stats_label"], font=font(SANS_B_PATH, 13),
+    d.text((MARGIN, 144), page["stats_label"], font=font(SANS_B_PATH, 13),
            fill=TEAL)
     # auto-layout: measure the values, then spread the columns so the
     # big serif numbers can never run into each other
-    size = 37
+    size = 34
     while size > 24:
         f_num = font(SERIF2_PATH, size)
         widths = [d.textlength(st["value"], font=f_num) for st in stats]
@@ -210,28 +210,30 @@ def stat_band(img, page, stats):
     for i, (st, w) in enumerate(zip(stats, widths)):
         x = xs[i]
         # amber bead on the rule above each column
-        d.ellipse([x + 1, 157, x + 7, 163], fill=AMBER)
-        d.text((x, 184), st["value"], font=f_num, fill=TITLE_GOLD)
+        d.ellipse([x + 1, 129, x + 7, 135], fill=AMBER)
+        d.text((x, 156), st["value"], font=f_num, fill=TITLE_GOLD)
         # a caption may never run into the next column or off the page
         right = xs[i + 1] if i + 1 < len(xs) else SIZE - MARGIN
         cap_w = right - x - 8
-        cy = 222
+        cy = 188
         for line in wrap(d, st["caption"], f_cap, cap_w):
             d.text((x, cy), line, font=f_cap, fill=(167, 178, 196))
             cy += 12.5
         x += w + gap
 
 # ---------------------------------------------------------------- the map
-MAP_Y = 242
-MAP_H = 58
+MAP_Y = 204
+MAP_H = 46
 
 
 # Pin positions on the map, as fractions of the box: placed for legibility
 # in sun order, as the page's own caption says - positions approximate.
 PIN_POS = {
-    1: (0.660, 0.50), 2: (0.598, 0.42), 3: (0.368, 0.36), 4: (0.628, 0.55),
-    5: (0.562, 0.30), 6: (0.518, 0.30), 7: (0.556, 0.58), 8: (0.400, 0.52),
-    9: (0.466, 0.30), 10: (0.434, 0.38), 11: (0.882, 0.80),
+    1: (0.672, 0.20), 2: (0.745, 0.53), 3: (0.600, 0.22), 4: (0.368, 0.22),
+    5: (0.618, 0.36), 6: (0.644, 0.53), 7: (0.552, 0.20),
+    8: (0.540, 0.53), 9: (0.514, 0.36), 10: (0.574, 0.36),
+    11: (0.596, 0.53), 12: (0.430, 0.53), 13: (0.352, 0.53),
+    14: (0.478, 0.20), 15: (0.455, 0.36), 16: (0.882, 0.53),
 }
 
 
@@ -277,7 +279,7 @@ def sun_map(img, page, dispatches, briefs):
     d.line(arc, fill=AMBER + (70,), width=5 * SS)
     d.line(arc, fill=AMBER + (255,), width=2 * SS)
     f_lab = font(SANS_B_PATH, 10 * SS)
-    for label, fx, ly in [("DAWN", 0.612, 1), ("DUSK", 0.688, 13),
+    for label, fx, ly in [("DAWN", 0.620, 1), ("DUSK", 0.688, 13),
                           ("MIDDAY", 0.83, 1)]:
         lx = fx * bw * SS
         ly = ly * SS
@@ -291,16 +293,16 @@ def sun_map(img, page, dispatches, briefs):
         px, py = px * SS, py * SS
         r = 1.8 * SS
         d.ellipse([px - r, py - r, px + r, py + r], fill=(205, 216, 233, 210))
-    f_pin = font(SANS_B_PATH, 10 * SS)
+    f_pin = font(SANS_B_PATH, int(8.5 * SS))
     for s in dispatches:
         fx, fy = PIN_POS[s["n"]]
         px, py = fx * bw * SS, fy * bh * SS
-        r = 10 * SS
+        r = 8.5 * SS
         d.ellipse([px - r, py - r, px + r, py + r], fill=AMBER,
                   outline=PIN_RING, width=2 * SS)
         label = str(s["n"])
         tw = d.textlength(label, font=f_pin)
-        d.text((px - tw / 2, py - 6 * SS), label, font=f_pin, fill=INK)
+        d.text((px - tw / 2, py - 5 * SS), label, font=f_pin, fill=INK)
     # caption along the bottom of the box
     draw_tracked(d, (10 * SS, (bh - 14) * SS), page["map_caption"],
                  font(SANS_PATH, 9 * SS), (168, 180, 200), 1.1 * SS)
@@ -366,6 +368,117 @@ def sky_drones(w, h):
     return art
 
 
+def scene_loom(w, h):
+    """Dhaka dispatch: a garment-belt skyline - factory blocks with lit
+    windows along the bottom edge, two chimneys trailing smoke."""
+    art, d, rng = _sky_base(w, h, 20261118 + 12)
+    x = -2.0
+    while x < w:
+        bw = rng.uniform(17, 30)
+        bh = h * rng.uniform(0.48, 0.82)
+        d.rectangle([x, h - bh, x + bw, h + 1], fill=(17, 30, 50, 255))
+        wy = h - bh + 3
+        while wy < h - 3:
+            wx = x + 3
+            while wx < x + bw - 3:
+                if rng.random() < 0.45:
+                    d.rectangle([wx, wy, wx + 2, wy + 2],
+                                fill=(245, 183, 84, 220))
+                wx += 6
+            wy += 5
+        x += bw + 2
+    for cxf in (0.22, 0.68):
+        cxp = w * cxf
+        d.rectangle([cxp, h * 0.18, cxp + 4, h * 0.55],
+                    fill=(17, 30, 50, 255))
+        for k in range(3):
+            r = 1.0 + k * 0.7
+            px, py = cxp + 2 + k * 3.0, h * 0.18 - 1 - k * 2.4
+            d.ellipse([px - r, py - r, px + r, py + r],
+                      fill=(200, 210, 225, 95))
+    return art
+
+
+def scene_stage(w, h):
+    """Sydney dispatch: awards-night stage beams converging from the
+    top corners, star bursts, a dotted crowd along the bottom."""
+    art, d, rng = _sky_base(w, h, 20261118 + 23)
+    for sx in (w * 0.06, w * 0.94):
+        for tx in (w * 0.38, w * 0.50, w * 0.62):
+            d.line([sx, 0, tx, h * 0.72], fill=(245, 183, 84, 110),
+                   width=2)
+    _burst(d, w * 0.50, h * 0.38, 9, rng)
+    _burst(d, w * 0.30, h * 0.55, 6, rng)
+    _burst(d, w * 0.70, h * 0.55, 6, rng)
+    for _ in range(26):
+        cx = rng.uniform(0, w)
+        cy = rng.uniform(h * 0.82, h * 0.98)
+        d.ellipse([cx - 1.3, cy - 1.3, cx + 1.3, cy + 1.3],
+                  fill=(215, 224, 240, 200))
+    return art
+
+
+def scene_split(w, h):
+    """Antalya dispatch: the COP31 split as one disc - amber half,
+    pale half, a jagged crack down the middle."""
+    art, d, rng = _sky_base(w, h, 20261118 + 38)
+    cx, cy, r = w * 0.5, h * 0.52, h * 0.40
+    d.ellipse([cx - r, cy - r, cx + r, cy + r], fill=(148, 163, 184, 255))
+    d.pieslice([cx - r, cy - r, cx + r, cy + r], 90, 270,
+               fill=(245, 183, 84, 255))
+    pts = [(cx, cy - r)]
+    for i in range(1, 5):
+        pts.append((cx + (3 if i % 2 else -3), cy - r + 2 * r * i / 5))
+    pts.append((cx, cy + r))
+    d.line(pts, fill=(10, 19, 34, 255), width=2)
+    for fx in (0.18, 0.82):
+        d.line([w * fx, cy, w * fx + 14, cy], fill=(200, 210, 225, 160),
+               width=1)
+    return art
+
+
+def scene_border(w, h):
+    """Addis Ababa dispatch: a ridge silhouette under a dashed amber
+    border line, two marker posts, a low sun."""
+    art, d, rng = _sky_base(w, h, 20261118 + 36)
+    d.ellipse([w * 0.80, h * 0.08, w * 0.80 + 9, h * 0.08 + 9],
+              fill=(245, 183, 84, 255))
+    pts = [(0, h + 1)]
+    for i in range(9):
+        pts.append((w * i / 8, h * rng.uniform(0.48, 0.72)))
+    pts.append((w, h + 1))
+    d.polygon(pts, fill=(18, 32, 52, 255))
+    for x in range(4, int(w) - 8, 10):
+        d.line([x, h * 0.40, x + 5, h * 0.40], fill=(240, 168, 60, 230),
+               width=1)
+    for fx in (0.30, 0.62):
+        d.line([w * fx, h * 0.40, w * fx, h * 0.80],
+               fill=(232, 226, 210, 255), width=2)
+    return art
+
+
+def scene_strait(w, h):
+    """Caracas dispatch: two headlands facing across a strait, a
+    dashed amber arc of agreement strung between them."""
+    art, d, rng = _sky_base(w, h, 20261118 + 44)
+    d.polygon([(0, h + 1), (0, h * 0.35), (w * 0.26, h * 0.55),
+               (w * 0.34, h + 1)], fill=(18, 32, 52, 255))
+    d.polygon([(w, h + 1), (w, h * 0.30), (w * 0.74, h * 0.52),
+               (w * 0.66, h + 1)], fill=(18, 32, 52, 255))
+    pts = []
+    for i in range(25):
+        t = i / 24.0
+        pts.append((w * (0.28 + 0.44 * t),
+                    h * 0.52 - 10 * math.sin(t * math.pi)))
+    for i in range(0, len(pts) - 1, 2):
+        d.line([pts[i], pts[i + 1]], fill=(240, 168, 60, 230), width=2)
+    for _ in range(10):
+        x = rng.uniform(w * 0.36, w * 0.64)
+        y = rng.uniform(h * 0.62, h * 0.92)
+        d.line([x, y, x + 4, y], fill=(190, 205, 228, 140), width=1)
+    return art
+
+
 def panel_art(name, w, h, cx, cy):
     """Crop a wide strip out of a carried-over illustrated panel."""
     src = Image.open(HERE / "art" / name).convert("RGB")
@@ -395,12 +508,23 @@ ART_ANCHORS = {
 }
 
 
+SCENES = {
+    "scene-loom": scene_loom,
+    "scene-stage": scene_stage,
+    "scene-split": scene_split,
+    "scene-border": scene_border,
+    "scene-strait": scene_strait,
+}
+
+
 def card_art(story, w, h):
     kind = story["art"]
     if kind == "sky-bursts":
         return sky_bursts(w, h)
     if kind == "sky-drones":
         return sky_drones(w, h)
+    if kind in SCENES:
+        return SCENES[kind](w, h)
     cx, cy = ART_ANCHORS[kind]
     return panel_art(kind, w, h, cx, cy)
 
@@ -475,25 +599,26 @@ def dispatch_card(img, story, x, y, w, h, art_h, head_size):
     while sum_size > 9.5:
         f_sum = font(SANS_PATH, sum_size)
         sum_lines = wrap(d, text, f_sum, w - 19)
-        if hy + 1 + len(sum_lines) * 12.5 <= y + h - 3:
+        if hy + 1 + len(sum_lines) * 11.5 <= y + h - 3:
             break
         sum_size -= 0.5
     for line in sum_lines:
         d.text((tx, hy + 1), line, font=f_sum, fill=BODY)
-        hy += 12.5
+        hy += 11.5
 
 
 def dispatches(img, page, stories):
     d = ImageDraw.Draw(img, "RGBA")
-    d.text((MARGIN, 306), page["dispatch_header"], font=font(SANS_B_PATH, 15),
+    d.text((MARGIN, 258), page["dispatch_header"], font=font(SANS_B_PATH, 15),
            fill=AMBER)
-    draw_right(d, (SIZE - MARGIN, 308), page["dispatch_note"],
+    draw_right(d, (SIZE - MARGIN, 260), page["dispatch_note"],
                font(SERIF_IT_PATH, 13), (159, 176, 200))
     by_n = {s["n"]: s for s in stories}
     rows = [
-        ([1, 2, 3], 324, 114, 309, 44, 19),
-        ([4, 5, 6, 7], 444, 108, 229, 36, 17),
-        ([8, 9, 10, 11], 558, 108, 229, 36, 17),
+        ([1, 2, 3, 4], 276, 100, 229, 28, 16),
+        ([5, 6, 7, 8], 381, 100, 229, 28, 16),
+        ([9, 10, 11, 12], 486, 100, 229, 28, 16),
+        ([13, 14, 15, 16], 591, 100, 229, 28, 16),
     ]
     for ns, y, h, w, art_h, head_size in rows:
         gap = (CW - w * len(ns)) / (len(ns) - 1)
@@ -503,7 +628,7 @@ def dispatches(img, page, stories):
 
 
 # ---------------------------------------------------------------- logbook
-BRIEF_PITCH = 11.0
+BRIEF_PITCH = 10.5
 
 
 def brief_line(img, b, x, y, max_w):
@@ -528,29 +653,29 @@ def brief_line(img, b, x, y, max_w):
 
 def logbook(img, page, legs, briefs):
     d = ImageDraw.Draw(img, "RGBA")
-    d.text((MARGIN, 670), page["logbook_header"], font=font(SANS_B_PATH, 15),
+    d.text((MARGIN, 697), page["logbook_header"], font=font(SANS_B_PATH, 15),
            fill=AMBER)
-    draw_right(d, (SIZE - MARGIN, 672), page["logbook_note"],
+    draw_right(d, (SIZE - MARGIN, 699), page["logbook_note"],
                font(SERIF_IT_PATH, 13), (159, 176, 200))
     by_n = {b["n"]: b for b in briefs}
     columns = {"left": (MARGIN, 466), "right": (522, 466)}
-    cursors = {"left": 694.0, "right": 694.0}
+    cursors = {"left": 721.0, "right": 721.0}
     for leg in legs:
         x, w = columns[leg["column"]]
         y = cursors[leg["column"]]
         if leg["header"]:
             d.text((x, y), leg["header"], font=font(SANS_B_PATH, 12), fill=TEAL)
-            y += 15
+            y += 14
         for n in leg["briefs"]:
             brief_line(img, by_n[n], x, y, w)
             y += BRIEF_PITCH
-        cursors[leg["column"]] = y + 6
+        cursors[leg["column"]] = y + 4
 
 
 # ---------------------------------------------------------------- footer
 def footer(img, page):
     d = ImageDraw.Draw(img, "RGBA")
-    box = (MARGIN, 957, SIZE - MARGIN, 991)
+    box = (MARGIN, 950, SIZE - MARGIN, 982)
     d.rounded_rectangle(box, radius=7, fill=(14, 24, 42, 255),
                         outline=AMBER_DEEP, width=1)
     f_lab = font(SANS_B_PATH, 11)
@@ -560,13 +685,13 @@ def footer(img, page):
         (page["cutting_text"], f_txt, BODY),
     ]
     lines = rich_wrap(d, segs, CW - 20)
-    ly = 963
+    ly = 956
     for line in lines[:2]:
         rich_draw(d, MARGIN + 10, ly, line, d.textlength(" ", font=f_txt))
         ly += 13
-    d.text((MARGIN, 996), page["footer_line"], font=font(SANS_PATH, 11),
+    d.text((MARGIN, 988), page["footer_line"], font=font(SANS_PATH, 11),
            fill=BODY)
-    d.text((MARGIN, 1010), page["sources_line"], font=font(SANS_PATH, 10),
+    d.text((MARGIN, 1002), page["sources_line"], font=font(SANS_PATH, 10),
            fill=MUTED)
 
 
@@ -576,12 +701,13 @@ def _load_data():
     # the page never truncates a story: refuse to render an ellipsis
     blob = json.dumps(data, ensure_ascii=False)
     assert "..." not in blob and "…" not in blob, "ellipsis in content"
-    assert len(data["dispatches"]) == 11 and len(data["briefs"]) == 41
+    assert len(data["dispatches"]) == 16 and len(data["briefs"]) == 36
     # prove the carried inputs decode under this Pillow: the coastline
     # data parses and every panel the page can ask for fully loads
     json.loads((HERE / "land.json").read_text())
     kinds = {s["art"] for s in data["dispatches"]}
-    for name in sorted(kinds - {"sky-bursts", "sky-drones"}):
+    procedural = {"sky-bursts", "sky-drones"} | set(SCENES)
+    for name in sorted(kinds - procedural):
         with Image.open(HERE / "art" / name) as probe:
             probe.load()
     return data
