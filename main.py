@@ -9,6 +9,7 @@ two runs produce byte-identical output. No network access.
 
 import json
 import math
+import os
 import random
 from pathlib import Path
 
@@ -46,6 +47,9 @@ def _font_file(name):
     for d in _FONT_DIRS:
         p = Path(d) / name
         if p.exists():
+            return str(p)
+    for d in _FONT_DIRS:  # same files, nested one level deeper
+        for p in sorted(Path(d).rglob(name)):
             return str(p)
     raise FileNotFoundError(name)
 
@@ -557,15 +561,17 @@ def main():
     img = render()
     again = render()
     assert img.tobytes() == again.tobytes(), "render is not deterministic"
+    # the graded copy goes to the output dir (the repo mount is read-only
+    # there, so the local convenience copy below must never be fatal)
+    shared = Path(os.environ.get("MAKEFUN_OUTPUT_DIR", "/output"))
+    shared.mkdir(parents=True, exist_ok=True)
+    img.save(shared / "entry.png", format="JPEG", quality=88)
     out = HERE / "entry.png"
-    img.save(out, format="JPEG", quality=88)
-    shared = Path("/output")
     try:
-        shared.mkdir(parents=True, exist_ok=True)
-        img.save(shared / "entry.png", format="JPEG", quality=88)
+        img.save(out, format="JPEG", quality=88)
     except OSError:
         pass
-    print("wrote", out)
+    print("wrote", shared / "entry.png")
 
 
 if __name__ == "__main__":
