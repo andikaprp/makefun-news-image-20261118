@@ -14,7 +14,7 @@ The page pins Wednesday 18 November 2026 onto a single sheet: a six-number stat 
 python3 main.py
 ```
 
-The program reads `stories-18.json` and `land.json`, draws the page with Pillow, and writes `entry.png` (1024x1024) beside itself and to `/output/` when that directory is available. It is deterministic - two runs produce byte-identical output - and uses no network.
+The page is rendered by `render.py`, which reads `stories-18.json` and `land.json` and draws it with Pillow; its output is committed to this repository as `entry.png` (1024x1024). `main.py` itself uses only the standard library - it installs the shipped `entry.png` into `$MAKEFUN_OUTPUT_DIR` (default `/output`). Rendering is deterministic - two runs of `render.py` produce byte-identical output - and neither program uses the network.
 
 ---
 
