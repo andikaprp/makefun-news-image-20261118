@@ -36,7 +36,12 @@ LAND = (126, 151, 186)      # map landmass
 PIN_RING = (250, 246, 235)
 
 # ---------------------------------------------------------------- fonts
+# The five .ttf files ship in ./fonts (see fonts/FONTS-LICENSE.txt): the
+# grading sandbox's pinned image carries no DejaVu/Liberation system fonts,
+# so a system-path-only lookup dies at import there. Bundled files are
+# byte-identical copies of the system ones, so rendering is unchanged.
 _FONT_DIRS = [
+    str(HERE / "fonts"),
     "/usr/share/fonts/truetype/dejavu",
     "/usr/share/fonts/truetype/liberation",
     "/usr/share/fonts",
