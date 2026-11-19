@@ -3,7 +3,7 @@
 
 Renders a single 1024x1024 page that sums up one day of world news:
 a stat band, a sun-order world map, eleven illustrated dispatches and
-a 34-brief logbook, all drawn from stories-18.json. Deterministic:
+a 41-brief logbook, all drawn from stories-18.json. Deterministic:
 two runs produce byte-identical output. No network access.
 """
 
@@ -202,21 +202,28 @@ def stat_band(img, page, stats):
         size -= 1
     gap = (CW - sum(widths)) / 5.0
     f_cap = font(SANS_PATH, 11)
-    x = float(MARGIN)
-    for st, w in zip(stats, widths):
+    xs = []
+    _x = float(MARGIN)
+    for w in widths:
+        xs.append(_x)
+        _x += w + gap
+    for i, (st, w) in enumerate(zip(stats, widths)):
+        x = xs[i]
         # amber bead on the rule above each column
         d.ellipse([x + 1, 157, x + 7, 163], fill=AMBER)
         d.text((x, 184), st["value"], font=f_num, fill=TITLE_GOLD)
-        cap_w = max(w + gap - 10, 152)
-        cy = 226
+        # a caption may never run into the next column or off the page
+        right = xs[i + 1] if i + 1 < len(xs) else SIZE - MARGIN
+        cap_w = right - x - 8
+        cy = 222
         for line in wrap(d, st["caption"], f_cap, cap_w):
             d.text((x, cy), line, font=f_cap, fill=(167, 178, 196))
             cy += 12.5
         x += w + gap
 
 # ---------------------------------------------------------------- the map
-MAP_Y = 258
-MAP_H = 64
+MAP_Y = 242
+MAP_H = 58
 
 
 # Pin positions on the map, as fractions of the box: placed for legibility
@@ -224,7 +231,7 @@ MAP_H = 64
 PIN_POS = {
     1: (0.660, 0.50), 2: (0.598, 0.42), 3: (0.368, 0.36), 4: (0.628, 0.55),
     5: (0.562, 0.30), 6: (0.518, 0.30), 7: (0.556, 0.58), 8: (0.400, 0.52),
-    9: (0.466, 0.30), 10: (0.434, 0.38), 11: (0.882, 0.86),
+    9: (0.466, 0.30), 10: (0.434, 0.38), 11: (0.882, 0.80),
 }
 
 
@@ -271,7 +278,7 @@ def sun_map(img, page, dispatches, briefs):
     d.line(arc, fill=AMBER + (255,), width=2 * SS)
     f_lab = font(SANS_B_PATH, 10 * SS)
     for label, fx, ly in [("DAWN", 0.612, 1), ("DUSK", 0.688, 13),
-                          ("MIDDAY", 0.612, 42)]:
+                          ("MIDDAY", 0.83, 1)]:
         lx = fx * bw * SS
         ly = ly * SS
         w = text_w(d, label, f_lab, 1.6 * SS)
@@ -478,15 +485,15 @@ def dispatch_card(img, story, x, y, w, h, art_h, head_size):
 
 def dispatches(img, page, stories):
     d = ImageDraw.Draw(img, "RGBA")
-    d.text((MARGIN, 330), page["dispatch_header"], font=font(SANS_B_PATH, 15),
+    d.text((MARGIN, 306), page["dispatch_header"], font=font(SANS_B_PATH, 15),
            fill=AMBER)
-    draw_right(d, (SIZE - MARGIN, 332), page["dispatch_note"],
+    draw_right(d, (SIZE - MARGIN, 308), page["dispatch_note"],
                font(SERIF_IT_PATH, 13), (159, 176, 200))
     by_n = {s["n"]: s for s in stories}
     rows = [
-        ([1, 2, 3], 348, 114, 309, 44, 19),
-        ([4, 5, 6, 7], 468, 108, 229, 36, 17),
-        ([8, 9, 10, 11], 582, 108, 229, 36, 17),
+        ([1, 2, 3], 324, 114, 309, 44, 19),
+        ([4, 5, 6, 7], 444, 108, 229, 36, 17),
+        ([8, 9, 10, 11], 558, 108, 229, 36, 17),
     ]
     for ns, y, h, w, art_h, head_size in rows:
         gap = (CW - w * len(ns)) / (len(ns) - 1)
@@ -496,7 +503,7 @@ def dispatches(img, page, stories):
 
 
 # ---------------------------------------------------------------- logbook
-BRIEF_PITCH = 11.8
+BRIEF_PITCH = 11.0
 
 
 def brief_line(img, b, x, y, max_w):
@@ -521,13 +528,13 @@ def brief_line(img, b, x, y, max_w):
 
 def logbook(img, page, legs, briefs):
     d = ImageDraw.Draw(img, "RGBA")
-    d.text((MARGIN, 694), page["logbook_header"], font=font(SANS_B_PATH, 15),
+    d.text((MARGIN, 670), page["logbook_header"], font=font(SANS_B_PATH, 15),
            fill=AMBER)
-    draw_right(d, (SIZE - MARGIN, 696), page["logbook_note"],
+    draw_right(d, (SIZE - MARGIN, 672), page["logbook_note"],
                font(SERIF_IT_PATH, 13), (159, 176, 200))
     by_n = {b["n"]: b for b in briefs}
     columns = {"left": (MARGIN, 466), "right": (522, 466)}
-    cursors = {"left": 718.0, "right": 718.0}
+    cursors = {"left": 694.0, "right": 694.0}
     for leg in legs:
         x, w = columns[leg["column"]]
         y = cursors[leg["column"]]
@@ -569,7 +576,7 @@ def _load_data():
     # the page never truncates a story: refuse to render an ellipsis
     blob = json.dumps(data, ensure_ascii=False)
     assert "..." not in blob and "…" not in blob, "ellipsis in content"
-    assert len(data["dispatches"]) == 11 and len(data["briefs"]) == 34
+    assert len(data["dispatches"]) == 11 and len(data["briefs"]) == 41
     # prove the carried inputs decode under this Pillow: the coastline
     # data parses and every panel the page can ask for fully loads
     json.loads((HERE / "land.json").read_text())

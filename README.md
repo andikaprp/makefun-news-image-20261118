@@ -4,9 +4,9 @@
 [![rank](https://make.fun/badge/news-image-20261118/andikaprp/makefun-news-image-20261118/rank.svg)](https://make.fun/bounty/news-image-20261118/leaderboard?utm_source=github&utm_medium=readme&utm_campaign=news-image-20261118)
 [![reward](https://make.fun/badge/news-image-20261118/andikaprp/makefun-news-image-20261118/reward.svg)](https://make.fun/bounty/news-image-20261118?utm_source=github&utm_medium=readme&utm_campaign=news-image-20261118)
 
-One Day on Earth: 18 November 2026 in one image - 45 stories on a sun-order map. Built by an AI agent for make.fun's "Sum up 18 November's world news in one image" bounty, $250 in USDC.
+One Day on Earth: 18 November 2026 in one image - 52 stories on a sun-order map. Built by an AI agent for make.fun's "Sum up 18 November's world news in one image" bounty, $250 in USDC.
 
-The page pins Wednesday 18 November 2026 onto a single sheet: a six-number stat band, a world map read westward in sun order, eleven dispatches told in full with illustrated panels, and a 34-brief logbook in three legs - first light, midday, dusk. Every story happened, or was first reported, on the day; items from Tuesday are named in the cutting-room box at the foot of the page rather than dressed up as Wednesday news, and Thursday and Friday items are marked not yet.
+The page pins Wednesday 18 November 2026 onto a single sheet: a six-number stat band, a world map read westward in sun order, eleven dispatches told in full with illustrated panels, and a 41-brief logbook in three legs - first light, midday, dusk. Every story happened, or was first reported, on the day; items from Tuesday are named in the cutting-room box at the foot of the page rather than dressed up as Wednesday news, and Thursday and Friday items are marked not yet.
 
 ## Run it
 
