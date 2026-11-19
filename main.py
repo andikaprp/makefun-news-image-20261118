@@ -292,7 +292,7 @@ BRIEFS = [
     (("Takaichi meets Putin",), 0,
      "TOKYO — Takaichi meets Putin, a first for a Japanese PM since 2022. (Kyodo)"),
     (("Yongbyon enrichment",), 0,
-     "YONGBYON — The IAEA says North Korea has extended its uranium enrichment plant. (Reuters)"),
+     "YONGBYON — IAEA says North Korea extended its enrichment plant. (Reuters)"),
     (("Magnitude 6.0",), 0,
      "PORT MORESBY — A magnitude 6.0 earthquake strikes Papua New Guinea. (USGS)"),
     (("state of disaster",), 0,
@@ -713,10 +713,11 @@ def gulf_art(w, h):
             x = (1 - t) * w * x0 + t * w * x1
             y = (1 - t) * h * y0 + t * h * y1 - math.sin(t * math.pi) * h * lift
             if prev is not None and i % 2 == 0:
-                d.line((prev, (x, y)), fill=AMBER, width=2)
+                d.line((prev, (x, y)), fill=AMBER, width=3)
             prev = (x, y)
     _burst(d, w * 0.34, h * 0.34, h * 0.16, (255, 214, 130))
     _burst(d, w * 0.58, h * 0.26, h * 0.12, (255, 214, 130))
+    _burst(d, w * 0.78, h * 0.44, h * 0.10, (255, 214, 130))
     # sea + skyline silhouette
     d.rectangle((0, h * 0.80, w, h), fill=(14, 30, 54))
     for fx, fh in ((0.04, 0.16), (0.12, 0.24), (0.22, 0.13), (0.55, 0.18),
